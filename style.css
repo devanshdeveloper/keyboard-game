@@ -1,0 +1,127 @@
+*,
+*::before,
+*::after {
+  transition: all .1s;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins";
+}
+
+:root {
+  --background: #000;
+  --borderColor: #303030;
+  --borderWidth: 3px;
+  --textColor: #fff;
+  --boxBackground: #101010;
+  --successBackground: #092f00;
+  --dangerBackground: #3b0000;
+  --fontSize: 1.3rem;
+  --charSize: 2.8rem;
+}
+
+/* startScreen */
+.startScreen,
+.wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  background-color: var(--background);
+  justify-content: center;
+}
+
+.startScreen form {
+  display: flex;
+  flex-direction: column;
+}
+
+#modal {
+  width: 700px;
+  max-width: 90%;
+  background-color: var(--boxBackground);
+  height: 50vh;
+  border-radius: 8px;
+  color: var(--textColor);
+  padding: 8px;
+  font-size: var(--fontSize);
+}
+
+#display {
+  position: fixed;
+  padding: 8px;
+  top: 10px;
+  left: 10px;
+  background-color: var(--boxBackground);
+  color: var(--textColor);
+  font-size: var(--fontSize);
+  z-index: 10;
+}
+label {
+  padding: 8px;
+  color: var(--textColor);
+  font-size: var(--fontSize);
+}
+
+input,
+button,
+.btn {
+  background-color: var(--boxBackground);
+  color: var(--textColor);
+  margin: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: var(--fontSize);
+}
+
+.world {
+  --left: 0;
+  left: calc(var(--left) * 1%);
+  position: fixed;
+  background-color: var(--background);
+  display: flex;
+  height: 100vh;
+}
+
+.word {
+  --left: 0;
+  left: calc(var(--left) * 1px);
+  --top: 0;
+  top: calc(var(--top) * 1px);
+  position: absolute;
+  display: flex;
+  height: 50px;
+}
+
+.char {
+  font-size: var(--charSize);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--boxBackground);
+  color: var(--textColor);
+  border-top: var(--borderWidth) solid var(--borderColor);
+  border-bottom: var(--borderWidth) solid var(--borderColor);
+  border-right: var(--borderWidth) solid var(--borderColor);
+}
+
+.char:first-child {
+  border-left: var(--borderWidth) solid var(--borderColor);
+}
+
+.char.selected {
+  background-color: var(--background);
+  border: var(--borderWidth) solid var(--textColor);
+}
+
+.char.red {
+  background-color: var(--dangerBackground);
+}
+.char.green {
+  background-color: var(--successBackground);
+}

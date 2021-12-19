@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <title>Keyboard Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" type="module"></script>
+</head>
+
+<body>
+    <div class="startScreen">
+        <form>
+            <div class="takeText">
+                <input autocomplete="OFF" type="text" placeholder="Paste Your Text!!" id="inputText">
+                <span class="btn" id="getRandomBtn">Take Random Text</span>
+            </div>
+            <div>
+                <label for="inputSpeed">Speed</label>
+                <input type="range" value="1" min="1" max="5" id="inputSpeed">
+            </div>
+            <div>
+                <label for="inputSpeedScale">Speed Scale</label>
+                <input type="range" value="1" min="1" max="5" id="inputSpeedScale">
+            </div>
+            <div>
+                <label for="inputSpeak">Wanna Listen??</label>
+                <input type="checkbox" id="inputSpeak">
+            </div>
+            <input type="submit" value="Start Game">
+        </form>
+    </div>
+    <div class="world">
+        <span id="display">
+            <span id="detail"></span>
+            <span id="showTime"></span>
+        </span>
+    </div>
+    <div class="wrapper">
+        <div id="modal"></div>
+    </div>
+</body>
+
+</html>
