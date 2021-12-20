@@ -7,6 +7,8 @@ export class Paragraph {
     this.evalPra(paragraph);
     this.corrected = 0;
     this.currentIndex = 0;
+    this.contiIncorrect = 0;
+    this.isVoilated = false;
     this.showTime = document.getElementById("showTime");
   }
   get isEnded() {
@@ -32,14 +34,20 @@ export class Paragraph {
   }
   isCorrect(key) {
     let bool = key === this.currentChar;
-    if (bool) this.corrected++;
+    if (bool) {
+      this.corrected++;
+      this.contiIncorrect = 0;
+    } else {
+      this.contiIncorrect++;
+      if (this.contiIncorrect > 10) this.isVoilated = true;
+    }
     return bool;
   }
   isNextWord() {
     if (this.currentIndex === 0) {
       var start = Date.now();
-      setInterval(() => {
-        this.timer = ((Date.now() - start) / 1000).toFixed(2)
+      this.timerInterval = setInterval(() => {
+        this.timer = ((Date.now() - start) / 1000).toFixed(2);
         this.showTime.innerHTML = `Time : ${this.timer}s`;
       }, 100);
     }

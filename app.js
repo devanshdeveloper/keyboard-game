@@ -7,6 +7,7 @@ import {
   isOnScreen,
   randomNumberBetween,
   setStyle,
+  useModal,
 } from "./utility.js";
 // variables
 let para,
@@ -18,7 +19,6 @@ let para,
   speedScale = 1;
 // elements
 const startScreen = document.querySelector(".startScreen");
-const wrapper = document.querySelector(".wrapper");
 const world = document.querySelector(".world");
 const form = startScreen.querySelector("form");
 const inputText = document.getElementById("inputText");
@@ -29,9 +29,8 @@ const detail = document.getElementById("detail");
 const inputSpeak = document.getElementById("inputSpeak");
 // onload
 addEventListener("DOMContentLoaded", () => {
-  wrapper.style.display = "none";
-  let queryPara = new URL(location).searchParams.get("para");
-  if (queryPara) handleStart(queryPara, 1, 1, false);
+  const queryPara = new URL(location).searchParams.get("para");
+  if (queryPara) handleStart(queryPara);
   else {
     world.style.display = "none";
     // events
@@ -54,37 +53,64 @@ addEventListener("DOMContentLoaded", () => {
 });
 
 // handlers
-function handleStart(text, paraSpeed, paraSpeedScale, paraToSpeak) {
-  if (text.length < 2000) para = new Paragraph(text);
-  else alert("Text Limit : 2000");
+function handleStart(
+  text,
+  paraSpeed = 1,
+  paraSpeedScale = 1,
+  paraToSpeak = false
+) {
+  console.log(text);
+  if (!text)
+    return useModal({
+      text: "No Text Found",
+    });
+  else if (text.length > 1000)
+    return useModal({
+      text: "Text Limit : 1000",
+    });
+  else para = new Paragraph(text);
   speed = paraSpeed / 100;
   incrementSpeedScale = paraSpeedScale / 80000;
   startScreen.style.display = "none";
   world.style.display = "flex";
   toSpeak = paraToSpeak;
+  if (innerWidth < 600) {
+    window.inputKey = document.createElement("input");
+    inputKey.type = "text";
+    document.body.append(inputKey);
+    inputKey.addEventListener("input", (e) => {
+      handlePress({ key: e.target.value[para.i] });
+    });
+    inputKey.focus();
+    document.addEventListener("click", () => inputKey.focus());
+  } else addEventListener("keydown", handlePress);
   createWorld();
   requestAnimationFrame(animateWorld);
-  addEventListener("keydown", handlePress);
   if (toSpeak) para.speakWord(para.currentWord);
 }
 
-function handleLose() {
+function handleLose(reason) {
   para.stopTimer();
-  wrapper.style.display = "flex";
-  modal.innerHTML = `
-  <span>Accuracy : ${((para.corrected / para.i) * 100).toFixed(2)}%<br>
-  Completed : ${((para.i / para.length) * 100).toFixed(2)}%<br>
-  WPM : ${para.getWPM()}<br>
-  Time : ${para.timer}s<br></span>
-  <button>Restart</button>`;
-  modal
-    .getElementsByTagName("button")[0]
-    .addEventListener("click", () => location.reload());
   removeEventListener("keydown", handlePress);
+  useModal({
+    heading: reason,
+    text: `
+    <span>Accuracy : ${((para.corrected / para.i) * 100).toFixed(2)}%<br>
+    Completed : ${((para.i / para.length) * 100).toFixed(2)}%<br>
+    WPM : ${para.getWPM()}<br>
+    Time : ${para.timer}s<br></span>`,
+    btns: [
+      {
+        text: "Restart",
+        onclick: () => {
+          location.reload();
+        },
+      },
+    ],
+  });
 }
 
-function handlePress(e) {
-  const { key } = e;
+function handlePress({ key }) {
   if (key === " ") moveWorld(200);
   else if (isAlphabet(key)) pressed(key);
 }
@@ -94,20 +120,21 @@ functions
 */
 // world
 function createWorld() {
+  const worldHeight = (innerWidth > 600 ? innerHeight : innerHeight / 2) - 100;
   let left = innerWidth;
   let prevWidth = 0;
   para.words.forEach((word) => {
     const wordDiv = document.createElement("div");
-    word.split("").forEach((char) => {
+    for (let i = 0; i < word.length; i++) {
       const charDiv = document.createElement("div");
       charDiv.classList.add("char");
-      charDiv.innerText = char;
+      charDiv.innerText = word[i];
       wordDiv.append(charDiv);
-    });
+    }
     world.append(wordDiv);
     wordDiv.classList.add("word");
-    setStyle(wordDiv, "--top", randomNumberBetween(50, innerHeight - 100));
-    left += randomNumberBetween(50, 75) + prevWidth;
+    setStyle(wordDiv, "--top", randomNumberBetween(50, worldHeight));
+    left += randomNumberBetween(50, 150) + prevWidth;
     prevWidth = wordDiv.offsetWidth;
     setStyle(wordDiv, "--left", left);
   });
@@ -127,7 +154,7 @@ function animateWorld(time) {
   updateSpeedScale(delta);
   lastTime = time;
   if (!checkLose()) requestAnimationFrame(animateWorld);
-  else handleLose();
+  else handleLose("Toooo Late To Press...");
 }
 
 function moveWorld(delta) {
@@ -152,11 +179,13 @@ function pressed(key) {
   else currentEl().classList.add("red");
   const isNext = para.isNextWord();
   if (toSpeak && isNext) para.speakWord(para.currentWord);
-  if (para.isEnded) return handleLose();
+  if (para.isEnded) return handleLose("Compeleted");
+  if (para.isVoilated) return handleLose("Violated The Rules");
   currentEl().classList.add("selected");
   detail.innerHTML = `
   Accuracy : ${((para.corrected / para.i) * 100).toFixed(2)}%<br>
   Completed : ${((para.i / para.length) * 100).toFixed(2)}%<br>
+  Pressed : ${key}<br>
   WPM : ${para.getWPM()}<br>
   `;
 }

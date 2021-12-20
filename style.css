@@ -1,7 +1,7 @@
 *,
 *::before,
 *::after {
-  transition: all .1s;
+  transition: all 0.25s;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -14,8 +14,8 @@
   --borderWidth: 3px;
   --textColor: #fff;
   --boxBackground: #101010;
-  --successBackground: #092f00;
-  --dangerBackground: #3b0000;
+  --successBackground: #136800;
+  --dangerBackground: #690000;
   --fontSize: 1.3rem;
   --charSize: 2.8rem;
 }
@@ -39,17 +39,27 @@
   flex-direction: column;
 }
 
-#modal {
+.modal {
   width: 700px;
   max-width: 90%;
   background-color: var(--boxBackground);
   height: 50vh;
   border-radius: 8px;
   color: var(--textColor);
-  padding: 8px;
+  padding: 25px;
   font-size: var(--fontSize);
 }
-
+.modal div {
+  margin-top: 10px;
+}
+.wrapper > span {
+  position: absolute;
+  top: 25px;
+  width: 100%;
+  text-align: center;
+  color: var(--textColor);
+  font-size: var(--charSize);
+}
 #display {
   position: fixed;
   padding: 8px;
@@ -124,4 +134,15 @@ button,
 }
 .char.green {
   background-color: var(--successBackground);
+}
+
+@media only screen and (max-width: 600px) {
+  :root {
+    --fontSize: 1rem;
+    --charSize: 1.9rem;
+  }
+  form {
+    width: 700px;
+    max-width: 90%;
+  }
 }
