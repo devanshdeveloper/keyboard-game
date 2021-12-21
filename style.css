@@ -60,7 +60,8 @@
   color: var(--textColor);
   font-size: var(--charSize);
 }
-#display {
+#display,
+#highestWPM {
   position: fixed;
   padding: 8px;
   top: 10px;
@@ -69,6 +70,10 @@
   color: var(--textColor);
   font-size: var(--fontSize);
   z-index: 10;
+}
+#highestWPM {
+  left: unset;
+  right: 10px;
 }
 label {
   padding: 8px;

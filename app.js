@@ -8,6 +8,7 @@ import {
   randomNumberBetween,
   setStyle,
   useModal,
+  lsItem,
 } from "./utility.js";
 // variables
 let para,
@@ -28,8 +29,12 @@ const inputSpeedScale = document.getElementById("inputSpeedScale");
 const getRandomBtn = document.getElementById("getRandomBtn");
 const detail = document.getElementById("detail");
 const inputSpeak = document.getElementById("inputSpeak");
+const highestWPM = document.getElementById("highestWPM");
+
 // onload
 addEventListener("DOMContentLoaded", () => {
+  const lsWPM = lsItem("wpm");
+  if (lsWPM) highestWPM.innerText = `Highest WPM : ${lsWPM}`;
   const queryPara = new URL(location).searchParams.get("para");
   if (queryPara) handleStart(queryPara);
   else {
@@ -94,6 +99,10 @@ function handleInputPress() {
 function handleLose(reason) {
   if (isGameOver) return;
   isGameOver = true;
+  if (para.wpm) {
+    lsItem("wpm", para.wpm);
+    highestWPM.innerText = "Highest WPM : " + para.wpm;
+  }
   para.stopTimer();
   if (innerWidth < 600) inputKey.removeEventListener("input", handleInputPress);
   else removeEventListener("keydown", handlePress);
