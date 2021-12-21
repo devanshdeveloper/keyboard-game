@@ -57,8 +57,8 @@ addEventListener("DOMContentLoaded", () => {
 // handlers
 function handleStart(
   text,
-  paraSpeed = 1,
-  paraSpeedScale = 1,
+  paraSpeed = 50,
+  paraSpeedScale = 50,
   paraToSpeak = false
 ) {
   if (!text)
