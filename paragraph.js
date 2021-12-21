@@ -1,4 +1,4 @@
-import { isAlphabet } from "./utility.js";
+import { isAlphabet, lsItem } from "./utility.js";
 
 export class Paragraph {
   constructor(paragraph) {
@@ -10,6 +10,10 @@ export class Paragraph {
     this.contiIncorrect = 0;
     this.isVoilated = false;
     this.showTime = document.getElementById("showTime");
+    this.highestWPMEL = document.getElementById("highestWPM");
+    const lsWPM = lsItem("wpm");
+    if (lsWPM) this.hiWPM = +lsWPM;
+    else this.hiWPM = 0;
   }
   get isEnded() {
     return this.length < this.i + 1;
@@ -30,10 +34,17 @@ export class Paragraph {
     return this.words[this.wordIndex];
   }
   get wpm() {
+    if (this.i < 10) return;
     return (this.wordIndex / (this.timer / 60)).toFixed(2);
   }
   subPara(start, end) {
     return this.p.substring(start, end);
+  }
+  set hiWPM(value) {
+    console.log(value);
+    if (!value || isNaN(value)) return;
+    this.highestWPMEL.innerText = `Highest WPM : ${value}`;
+    this.highestWPM = +value;
   }
   isCorrect(key) {
     let bool = key === this.currentChar;
@@ -50,14 +61,16 @@ export class Paragraph {
     if (this.currentIndex === 0) {
       var start = Date.now();
       this.timerInterval = setInterval(() => {
+        const wpm = this.wpm || "";
         this.timer = ((Date.now() - start) / 1000).toFixed(2);
-        this.showTime.innerHTML = `WPM : ${this.wpm}<br>Time : ${this.timer}s`;
+        this.showTime.innerHTML = `WPM : ${wpm}<br>Time : ${this.timer}s`;
+        if (+wpm > this.highestWPM) this.hiWPM = wpm;
       }, 100);
     }
     this.currentIndex++;
     this.paraIndex++;
     if (this.paragraph[this.paraIndex] === " ") {
-      this.paraIndex++;
+      this.paraIndx++;
       this.wordIndex++;
       return true;
     }
@@ -90,7 +103,7 @@ export class Paragraph {
     clearInterval(this.timerInterval);
   }
   reset() {
-    this.showTime.innerText = ""
+    this.showTime.innerText = "";
     this.timer = 0;
     this.paraIndex = 0;
     this.wordIndex = 0;

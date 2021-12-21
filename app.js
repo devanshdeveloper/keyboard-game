@@ -8,7 +8,6 @@ import {
   randomNumberBetween,
   setStyle,
   useModal,
-  lsItem,
 } from "./utility.js";
 // variables
 let para,
@@ -29,12 +28,9 @@ const inputSpeedScale = document.getElementById("inputSpeedScale");
 const getRandomBtn = document.getElementById("getRandomBtn");
 const detail = document.getElementById("detail");
 const inputSpeak = document.getElementById("inputSpeak");
-const highestWPM = document.getElementById("highestWPM");
 
 // onload
 addEventListener("DOMContentLoaded", () => {
-  const lsWPM = lsItem("wpm");
-  if (lsWPM) highestWPM.innerText = `Highest WPM : ${lsWPM}`;
   const queryPara = new URL(location).searchParams.get("para");
   if (queryPara) handleStart(queryPara);
   else {
@@ -74,8 +70,8 @@ function handleStart(
       text: "Text Limit : 1000",
     });
   else para = new Paragraph(text);
-  speed = paraSpeed / 100;
-  incrementSpeedScale = paraSpeedScale / 80000;
+  speed = 0.025 * (paraSpeed / 100);
+  incrementSpeedScale = 0.000025 * (paraSpeedScale / 100);
   startScreen.style.display = "none";
   world.style.display = "flex";
   toSpeak = paraToSpeak;
@@ -90,6 +86,7 @@ function handleStart(
   createWorld();
   requestAnimationFrame(animateWorld);
   if (toSpeak) para.speakWord(para.currentWord);
+  addEventListener("beforeunload", () => lsItem("wpm", para.highestWPM));
 }
 
 function handleInputPress() {
@@ -99,10 +96,6 @@ function handleInputPress() {
 function handleLose(reason) {
   if (isGameOver) return;
   isGameOver = true;
-  if (para.wpm) {
-    lsItem("wpm", para.wpm);
-    highestWPM.innerText = "Highest WPM : " + para.wpm;
-  }
   para.stopTimer();
   if (innerWidth < 600) inputKey.removeEventListener("input", handleInputPress);
   else removeEventListener("keydown", handlePress);
@@ -170,7 +163,7 @@ function createWorld() {
     world.append(wordDiv);
     wordDiv.classList.add("word");
     setStyle(wordDiv, "--top", randomNumberBetween(50, worldHeight));
-    left += randomNumberBetween(50, 150) + prevWidth;
+    left += randomNumberBetween(50, 200) + prevWidth;
     prevWidth = wordDiv.offsetWidth;
     setStyle(wordDiv, "--left", left);
   });
