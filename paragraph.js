@@ -29,6 +29,9 @@ export class Paragraph {
   get currentWord() {
     return this.words[this.wordIndex];
   }
+  get wpm() {
+    return (this.wordIndex / (this.timer / 60)).toFixed(2);
+  }
   subPara(start, end) {
     return this.p.substring(start, end);
   }
@@ -48,7 +51,7 @@ export class Paragraph {
       var start = Date.now();
       this.timerInterval = setInterval(() => {
         this.timer = ((Date.now() - start) / 1000).toFixed(2);
-        this.showTime.innerHTML = `Time : ${this.timer}s`;
+        this.showTime.innerHTML = `WPM : ${this.wpm}<br>Time : ${this.timer}s`;
       }, 100);
     }
     this.currentIndex++;
@@ -83,18 +86,17 @@ export class Paragraph {
   speakWord(word) {
     speechSynthesis.speak(new SpeechSynthesisUtterance(word));
   }
-  getWPM() {
-    return (this.wordIndex / (this.timer / 60)).toFixed(2);
-  }
   stopTimer() {
     clearInterval(this.timerInterval);
   }
-  getInsights() {
-    let tempObj = {};
-    for (let i = 0; i < this.paragraph.length; i++) {
-      const e = this.paragraph[i];
-      tempObj[e] = (tempObj[e] || 0) + 1;
-    }
-    return tempObj;
+  reset() {
+    this.showTime.innerText = ""
+    this.timer = 0;
+    this.paraIndex = 0;
+    this.wordIndex = 0;
+    this.corrected = 0;
+    this.currentIndex = 0;
+    this.contiIncorrect = 0;
+    this.isVoilated = false;
   }
 }

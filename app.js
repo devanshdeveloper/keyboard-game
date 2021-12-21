@@ -16,6 +16,7 @@ let para,
   speed,
   incrementSpeedScale,
   toSpeak,
+  isGameOver = false,
   speedScale = 1;
 // elements
 const startScreen = document.querySelector(".startScreen");
@@ -59,7 +60,6 @@ function handleStart(
   paraSpeedScale = 1,
   paraToSpeak = false
 ) {
-  console.log(text);
   if (!text)
     return useModal({
       text: "No Text Found",
@@ -76,11 +76,9 @@ function handleStart(
   toSpeak = paraToSpeak;
   if (innerWidth < 600) {
     window.inputKey = document.createElement("input");
-    inputKey.type = "text";
+    inputKey.type = "password";
     document.body.append(inputKey);
-    inputKey.addEventListener("input", (e) => {
-      handlePress({ key: e.target.value[para.i] });
-    });
+    inputKey.addEventListener("input", handleInputPress);
     inputKey.focus();
     document.addEventListener("click", () => inputKey.focus());
   } else addEventListener("keydown", handlePress);
@@ -89,30 +87,59 @@ function handleStart(
   if (toSpeak) para.speakWord(para.currentWord);
 }
 
+function handleInputPress() {
+  handlePress({ key: inputKey.value[para.i] || " " });
+}
+
 function handleLose(reason) {
+  if (isGameOver) return;
+  isGameOver = true;
   para.stopTimer();
-  removeEventListener("keydown", handlePress);
+  if (innerWidth < 600) inputKey.removeEventListener("input", handleInputPress);
+  else removeEventListener("keydown", handlePress);
   useModal({
     heading: reason,
-    text: `
+    text:
+      para.i > 10
+        ? `
     <span>Accuracy : ${((para.corrected / para.i) * 100).toFixed(2)}%<br>
     Completed : ${((para.i / para.length) * 100).toFixed(2)}%<br>
-    WPM : ${para.getWPM()}<br>
-    Time : ${para.timer}s<br></span>`,
+    WPM : ${para.wpm}<br>
+    Time : ${para.timer}s<br></span>`
+        : "Press Restart",
     btns: [
       {
         text: "Restart",
-        onclick: () => {
-          location.reload();
-        },
+        onclick: handleRestart,
+      },
+      {
+        text: "Reset",
+        onclick: () => location.replace(location.origin),
       },
     ],
   });
+  AllCharsEl.forEach((e) => e.classList.remove("selected", "green", "red"));
+  setStyle(world, "--left", 0);
 }
 
-function handlePress({ key }) {
+function handlePress({ altKey, ctrlKey, key }) {
+  if (altKey || ctrlKey) return;
   if (key === " ") moveWorld(200);
   else if (isAlphabet(key)) pressed(key);
+}
+
+function handleRestart() {
+  isGameOver = false;
+  speedScale = 1;
+  lastTime = null;
+  para.reset();
+  detail.innerHTML = "";
+  if (innerWidth < 600) {
+    inputKey.value = "";
+    inputKey.addEventListener("input", handleInputPress);
+    inputKey.focus();
+  } else addEventListener("keydown", handlePress);
+  requestAnimationFrame(animateWorld);
 }
 
 /*
@@ -144,6 +171,7 @@ function createWorld() {
 }
 
 function animateWorld(time) {
+  if (isGameOver) return;
   if (!lastTime) {
     lastTime = time;
     requestAnimationFrame(animateWorld);
@@ -153,8 +181,8 @@ function animateWorld(time) {
   moveWorld(delta);
   updateSpeedScale(delta);
   lastTime = time;
-  if (!checkLose()) requestAnimationFrame(animateWorld);
-  else handleLose("Toooo Late To Press...");
+  if (checkLose()) handleLose("Toooo Late To Press...");
+  else requestAnimationFrame(animateWorld);
 }
 
 function moveWorld(delta) {
@@ -182,10 +210,10 @@ function pressed(key) {
   if (para.isEnded) return handleLose("Compeleted");
   if (para.isVoilated) return handleLose("Violated The Rules");
   currentEl().classList.add("selected");
-  detail.innerHTML = `
+  if (innerWidth > 600)
+    detail.innerHTML = `
   Accuracy : ${((para.corrected / para.i) * 100).toFixed(2)}%<br>
   Completed : ${((para.i / para.length) * 100).toFixed(2)}%<br>
   Pressed : ${key}<br>
-  WPM : ${para.getWPM()}<br>
   `;
 }

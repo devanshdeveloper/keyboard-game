@@ -3,7 +3,7 @@ export const randomText =
     .split(". ")
     .sort(() => Math.random() - 0.5)
     .join(". ")
-    .substring(0, 1000);
+    .substring(0, 500);
 export function getStyle(elem, prop) {
   return parseFloat(getComputedStyle(elem).getPropertyValue(prop)) || 0;
 }
