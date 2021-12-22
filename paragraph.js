@@ -41,13 +41,12 @@ export class Paragraph {
     return this.p.substring(start, end);
   }
   set hiWPM(value) {
-    console.log(value);
     if (!value || isNaN(value)) return;
     this.highestWPMEL.innerText = `Highest WPM : ${value}`;
     this.highestWPM = +value;
   }
   isCorrect(key) {
-    let bool = key === this.currentChar;
+    const bool = key === this.currentChar;
     if (bool) {
       this.corrected++;
       this.contiIncorrect = 0;

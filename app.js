@@ -8,6 +8,7 @@ import {
   randomNumberBetween,
   setStyle,
   useModal,
+  lsItem,
 } from "./utility.js";
 // variables
 let para,
@@ -28,12 +29,22 @@ const inputSpeedScale = document.getElementById("inputSpeedScale");
 const getRandomBtn = document.getElementById("getRandomBtn");
 const detail = document.getElementById("detail");
 const inputSpeak = document.getElementById("inputSpeak");
+const inputTheme = document.getElementById("inputTheme");
 
 // onload
 addEventListener("DOMContentLoaded", () => {
+  const theme = lsItem("theme");
+  if (theme) {
+    inputTheme.checked = theme === "light";
+    useLightMode(inputTheme.checked);
+  }
   const queryPara = new URL(location).searchParams.get("para");
   if (queryPara) handleStart(queryPara);
   else {
+    addEventListener("beforeunload", () => {
+      lsItem("theme", document.body.dataset.theme || "dark");
+      lsItem("wpm", para.highestWPM);
+    });
     world.style.display = "none";
     // events
     form.addEventListener("submit", (e) => {
@@ -50,6 +61,9 @@ addEventListener("DOMContentLoaded", () => {
     });
     inputText.addEventListener("focus", () =>
       navigator.clipboard.readText().then((text) => (inputText.value = text))
+    );
+    inputTheme.addEventListener("input", () =>
+      useLightMode(inputTheme.checked)
     );
   }
 });
@@ -86,11 +100,11 @@ function handleStart(
   createWorld();
   requestAnimationFrame(animateWorld);
   if (toSpeak) para.speakWord(para.currentWord);
-  addEventListener("beforeunload", () => lsItem("wpm", para.highestWPM));
 }
 
 function handleInputPress() {
-  handlePress({ key: inputKey.value[para.i] || " " });
+  const value = inputKey.value;
+  handlePress({ key: value[value.length - 1] });
 }
 
 function handleLose(reason) {
@@ -218,4 +232,8 @@ function pressed(key) {
   Completed : ${((para.i / para.length) * 100).toFixed(2)}%<br>
   Pressed : ${key}<br>
   `;
+}
+
+function useLightMode(bool) {
+  document.body.dataset.theme = bool ? "light" : "dark";
 }
